@@ -1,7 +1,6 @@
 var inquirer = require("inquirer");
 
-var wordsList = ["Jurassic Park", "Star Wars", "Fast And Furious", 
-"Justice League", "Thor"];
+var wordsList = ["Thor", "Avengers"];
 
 // Solution will be held here.
 var chosenWord = "";
@@ -19,23 +18,13 @@ function Hangman(word, letter) {
 	this.letter = letter;
 }
 
-var guess = function() {
-	inquirer.prompt([
-		{
-			name: "letter",
-			message: "Guess a letter!"
-		}
-	]).then(function(answers) {
-		console.log("you guessed");
-	})
-}
-
-var displayUnderscore = function() {
-	// Solution is chosen randomly from wordList.
-	chosenWord = wordsList[Math.floor(Math.random() * wordsList.length)];
+var startGame = function() {
+  var numGuesses = 9;
+  // Solution is chosen randomly from wordList.
+  chosenWord = wordsList[Math.floor(Math.random() * wordsList.length)];
 
   // The word is broken into individual letters.
-  lettersInChosenWord = chosenWord.split("");	
+  lettersInChosenWord = chosenWord.split(""); 
 
   // We count the number of letters in the word.
   numBlanks = lettersInChosenWord.length;
@@ -57,9 +46,50 @@ var displayUnderscore = function() {
 
   // Print the initial blanks in console.
   console.log(blanksAndSuccesses);
+  guess();
+}
+var guess = function() {
+	inquirer.prompt([
+		{
+			name: "letter",
+			message: "Guess a letter!",
+      validate: function(value) {
+        if (isNaN(value) === true) {
+          return true;
+        }
+        return false;
+      }
+		}
+	]).then(function(answers) {
+    if (lettersInChosenWord.toString() === blanksAndSuccesses.toString()) {
+      console.log("You win!");
+    } else {
+      // This boolean will be toggled based on whether or not a user letter is found anywhere in the word.
+      var letterInWord = false;
+
+      for (var i = 0; i < numBlanks; i++) {
+        if (chosenWord[i] === answers.letter) {
+          letterInWord = true;
+        }
+      }
+      // if answers (which is the user guess) is in the array of words, then display it on the screen. So, redisplay the blanks and successes
+
+      if (letterInWord) {
+        for (var j = 0; j < numBlanks; j++) {
+
+          if (chosenWord[j] === answers.letter) {
+            blanksAndSuccesses[j] = answers.letter;
+          }
+        }
+        console.log(blanksAndSuccesses);
+      } else {
+        wrongGuesses.push(answers.letter);
+        numGuesses--;
+      }      
+    }
+	})
 }
 
-guess();
-displayUnderscore();
-// call the function to show the word after guess.
 
+startGame();
+// call the function to show the word after guess.
