@@ -1,25 +1,18 @@
 var inquirer = require("inquirer");
 
-var wordsList = ["Thor", "Avengers"];
-
-// Solution will be held here.
-var chosenWord = "";
-// This will break the solution into individual letters to be stored in array.
-var lettersInChosenWord = [];
-// This will be the number of blanks we show based on the solution
-var numBlanks = 0;
-// Holds a mix of blank and solved letters (ex: 'n, _ _, n, _').
-var blanksAndSuccesses = [];
-// Holds all of the wrong guesses
-var wrongGuesses = [];
+// the words that the user will guess
+var wordsList = ["batman", "superman", "wonderwoman", "cyborg", "aquaman"];
 
 function Hangman(word, letter) {
 	this.word = word;
 	this.letter = letter;
 }
 
+// initialize the number of guesses
+var numGuesses = 9;
+
 var startGame = function() {
-  var numGuesses = 9;
+
   // Solution is chosen randomly from wordList.
   chosenWord = wordsList[Math.floor(Math.random() * wordsList.length)];
 
@@ -61,9 +54,6 @@ var guess = function() {
       }
 		}
 	]).then(function(answers) {
-    if (lettersInChosenWord.toString() === blanksAndSuccesses.toString()) {
-      console.log("You win!");
-    } else {
       // This boolean will be toggled based on whether or not a user letter is found anywhere in the word.
       var letterInWord = false;
 
@@ -73,23 +63,36 @@ var guess = function() {
         }
       }
       // if answers (which is the user guess) is in the array of words, then display it on the screen. So, redisplay the blanks and successes
-
       if (letterInWord) {
         for (var j = 0; j < numBlanks; j++) {
 
           if (chosenWord[j] === answers.letter) {
+            console.log("CORRECT!!!\n");
             blanksAndSuccesses[j] = answers.letter;
           }
         }
         console.log(blanksAndSuccesses);
+        if (lettersInChosenWord.toString() === blanksAndSuccesses.toString()) {
+          console.log("You win!")
+        } else {
+          guess();
+        }
       } else {
+
         wrongGuesses.push(answers.letter);
         numGuesses--;
+        console.log("INCORRECT LETTER!!!\n");
+        console.log(numGuesses + " guesses remaining!!!\n");
+        guess();
+        if (numGuesses === 0) {
+          console.log("\nYou lose!");
+          console.log("Start over!");
+          startGame();
+          numGuesses = 9;
+        }
       }      
-    }
 	})
 }
 
-
+// calling the function to start the game
 startGame();
-// call the function to show the word after guess.
